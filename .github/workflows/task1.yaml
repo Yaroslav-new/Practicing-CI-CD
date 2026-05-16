@@ -1,0 +1,74 @@
+
+name: Multiple Jobs WorkFlow
+
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+
+  job1_windows:
+      runs-on: windows-latest
+
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Go program
+        run: go run main.go
+
+  job2_ubuntu:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Go program
+        run: go run main.go
+
+  job3_macOS:
+      runs-on: macos-latest
+
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Go program
+        run: go run main.go
+
+  job4_waiting_3jobs_above:
+    needs: [job1_windows, job2_ubuntu, job3_macOS]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build Linux binary
+        run: GOOS=linux GOARCH=amd64 go build -o app-linux main.go
+
+      - name: Build Windows binary
+        run: GOOS=windows GOARCH=amd64 go build -o app-windows.exe main.go
+
+      - name: Build macOS binary
+        run: GOOS=darwin GOARCH=amd64 go build -o app-macos main.go
