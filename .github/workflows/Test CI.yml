@@ -1,32 +1,76 @@
-# This is a basic workflow to help you get started with Actions
 
-name: Test CI
+name: Multiple Jobs WorkFlow
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
   job1_windows:
-    build:
       runs-on: windows-latest
 
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Go program
+        run: go run main.go
+
   job2_ubuntu:
-    build: 
       runs-on: ubuntu-latest
 
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Go program
+        run: go run main.go
+
   job3_macOS:
-    build:
       runs-on: macos-latest
+
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Go program
+        run: go run main.go
 
   job4_waiting_3jobs_above:
     needs: [job1_windows, job2_ubuntu, job3_macOS]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build Linux binary
+        run: GOOS=linux GOARCH=amd64 go build -o app-linux main.go
+
+      - name: Build Windows binary
+        run: GOOS=windows GOARCH=amd64 go build -o app-windows.exe main.go
+
+      - name: Build macOS binary
+        run: GOOS=darwin GOARCH=amd64 go build -o app-macos main.go
